@@ -14,7 +14,7 @@ const Notification = ({ message, onClose }) => {
           }
           return oldProgress - 1;
         });
-      }, 50);
+      }, 40);
 
       return () => clearInterval(timer);
     }

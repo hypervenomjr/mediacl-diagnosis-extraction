@@ -6,15 +6,21 @@ import Notification from "./Components/Notification";
 
 export default function Home() {
   const [file, setFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
   const [diagnosis, setDiagnosis] = useState("");
+  const [csvLink, setCsvLink] = useState(""); // Store CSV file link
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState("");
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const uploadedFile = e.target.files[0];
+    setFile(uploadedFile);
+    if (uploadedFile) {
+      setFileURL(URL.createObjectURL(uploadedFile)); // Set the file URL for preview
+    }
   };
 
-  const handleSubmit = async (e) => {
+  const handleExtract = async (e) => {
     e.preventDefault();
     if (!file) {
       setNotification("Please upload a file first.");
@@ -37,6 +43,7 @@ export default function Home() {
         setNotification("No diagnosis found");
       } else {
         setDiagnosis(response.data.diagnosis);
+        setCsvLink(response.data.csvLink); // Assuming the API returns a link to the CSV file
         setNotification("");
       }
     } catch (error) {
@@ -47,24 +54,61 @@ export default function Home() {
     }
   };
 
+  const handleUpload = () => {
+    if (!file) {
+      setNotification("No file uploaded. Please select a file.");
+    } else {
+      setNotification("File uploaded successfully!");
+      setTimeout(() => {
+        setNotification("");
+      }, 3000);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="bg-white shadow-md rounded-lg p-8 max-w-lg">
-        <h1 className="text-4xl font-extrabold text-center text-indigo-600 mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 relative">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
+        <h1 className="text-4xl font-extrabold text-center text-indigo-600 mb-6 animate-fadeIn">
           Medical Diagnosis Extraction
         </h1>
 
         {/* Form Section */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form className="space-y-6">
+          {/* File Upload Input */}
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none transition-transform duration-300 ease-in-out hover:scale-105 hover:border-indigo-600"
+            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer transition-colors duration-300 ease-in-out hover:border-indigo-600"
           />
+
+          {/* Upload Button */}
+          <button
+            type="button"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors duration-300 ease-in-out"
+            onClick={handleUpload}
+          >
+            <ArrowUpTrayIcon className="h-5 w-5" />
+            <span>Upload</span>
+          </button>
+
+          {/* File Preview (opens image in a new tab) */}
+          {fileURL && (
+            <a
+              href={fileURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline block mt-2 text-center hover:text-blue-800 transition-colors duration-300 ease-in-out"
+            >
+              Preview Uploaded Image
+            </a>
+          )}
+
+          {/* Extract Button */}
           <button
             type="submit"
-            className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center space-x-2 transition duration-300 ease-in-out transform hover:scale-105 ${
+            onClick={handleExtract}
+            className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors duration-300 ease-in-out ${
               loading ? "animate-pulse" : ""
             }`}
           >
@@ -92,17 +136,41 @@ export default function Home() {
             ) : (
               <ArrowUpTrayIcon className="h-5 w-5" />
             )}
-            <span>{loading ? "Processing..." : "Upload and Extract"}</span>
+            <span>{loading ? "Processing..." : "Extract Diagnosis"}</span>
           </button>
         </form>
 
-        {/* Diagnosis Section */}
+        {/* Diagnosis and CSV Options Section */}
         {diagnosis && (
-          <div className="mt-8 p-4 bg-green-50 rounded-lg transition-opacity duration-500 ease-in-out animate-fadeIn">
+          <div className="mt-8 p-4 bg-green-50 rounded-lg shadow-md transition-opacity duration-300 ease-in-out opacity-90">
             <h2 className="text-2xl font-semibold text-green-700">
               Extracted Diagnosis:
             </h2>
             <p className="text-lg mt-2 text-gray-800">{diagnosis}</p>
+
+            {/* CSV File Options */}
+            {csvLink && (
+              <div className="mt-4 space-x-4">
+                {/* Preview CSV Button */}
+                <a
+                  href={csvLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800 transition-colors duration-300 ease-in-out"
+                >
+                  Preview CSV
+                </a>
+
+                {/* Download CSV Button */}
+                <a
+                  href={csvLink}
+                  download
+                  className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-transform duration-300 ease-in-out"
+                >
+                  Download CSV
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>
