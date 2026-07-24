@@ -1,20 +1,14 @@
+# FinMedAI — Frontend
+
+Next.js frontend for **FinMedAI**, a healthcare platform that automates diagnosis extraction and maps findings to **ICD-10** codes. Built for **Bajaj HackRx 5.0**.
+
+> 🔗 **Full project (frontend + backend):** https://github.com/HackRx50/PS2-Hackhounds
+
+## Tech Stack
+Next.js · React · TypeScript · Axios
 
 ## Getting Started
-
-Clone the repository to your local machine using Git:
-```
-git clone https://github.com/chetali-1004/mediacl-diagnosis-extraction.git
-```
-
-Navigate to the project directory and install the required dependencies:
-```
-npm install
-```
-
-Start the development server with:
 ```bash
-npm run dev
+npm install
+npm run dev   # -> http://localhost:3000
 ```
-The application will be available at [http://localhost:3000](http://localhost:3000)
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
